@@ -69,7 +69,7 @@ DiscordButton.Parent = Frame
 local Watermark = Instance.new("TextLabel")
 Watermark.Size = UDim2.new(0.6, 0, 0.1, 0)
 Watermark.Position = UDim2.new(0.2, 0, 0.9, 0)
-Watermark.Text = "discord.gg/example"
+Watermark.Text = "discord.gg/aq87xSYpQ6"
 Watermark.TextColor3 = Color3.fromRGB(200, 200, 255)
 Watermark.TextTransparency = 0.3
 Watermark.Font = Enum.Font.Gotham
@@ -132,7 +132,7 @@ end)
 
 -- Логика кнопки Discord (копирует ссылку)
 DiscordButton.MouseButton1Click:Connect(function()
-    setclipboard("https://discord.gg/example") -- Сюда вставьте свою ссылку
+    setclipboard("https://discord.gg/aq87xSYpQ6") -- Новая ссылка
     DiscordButton.Text = "Copied!"
     wait(1)
     DiscordButton.Text = "Discord"
