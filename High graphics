@@ -1,0 +1,145 @@
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:FindFirstChild("PlayerGui")
+
+if not PlayerGui then
+    repeat wait() until Player:FindFirstChild("PlayerGui")
+    PlayerGui = Player.PlayerGui
+end
+
+local effectsEnabled = false
+
+-- Создание GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 300, 0, 200)
+Frame.Position = UDim2.new(0.5, -150, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
+
+-- Заголовок High Graphics
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0.2, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "High Graphics"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+Title.BackgroundTransparency = 1
+Title.Parent = Frame
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+TextBox.PlaceholderText = "Code"
+TextBox.Text = ""
+TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Parent = Frame
+
+-- Кнопка Verify
+local VerifyButton = Instance.new("TextButton")
+VerifyButton.Size = UDim2.new(0.4, -5, 0.2, 0)
+VerifyButton.Position = UDim2.new(0.1, 0, 0.5, 0)
+VerifyButton.Text = "Verify"
+VerifyButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+VerifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+VerifyButton.Parent = Frame
+
+-- Кнопка Discord
+local DiscordButton = Instance.new("TextButton")
+DiscordButton.Size = UDim2.new(0.4, -5, 0.2, 0)
+DiscordButton.Position = UDim2.new(0.5, 5, 0.5, 0)
+DiscordButton.Text = "Discord"
+DiscordButton.BackgroundColor3 = Color3.fromRGB(70, 70, 120)
+DiscordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DiscordButton.Parent = Frame
+
+-- Водяной знак (эффект стекла)
+local Watermark = Instance.new("TextLabel")
+Watermark.Size = UDim2.new(0.6, 0, 0.1, 0)
+Watermark.Position = UDim2.new(0.2, 0, 0.9, 0)
+Watermark.Text = "discord.gg/example"
+Watermark.TextColor3 = Color3.fromRGB(200, 200, 255)
+Watermark.TextTransparency = 0.3
+Watermark.Font = Enum.Font.Gotham
+Watermark.TextSize = 14
+Watermark.BackgroundTransparency = 0.5
+Watermark.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Watermark.Parent = Frame
+
+-- Активация эффектов
+local function EnableEffects()
+    if effectsEnabled then return end
+    effectsEnabled = true
+
+    local bloom = Instance.new("BloomEffect")
+    bloom.Intensity = 1.5
+    bloom.Size = 24
+    bloom.Threshold = 0.8
+    bloom.Name = "BloomEffect"
+    bloom.Parent = Lighting
+
+    local colorCorrection = Instance.new("ColorCorrectionEffect")
+    colorCorrection.Brightness = 0.1
+    colorCorrection.Contrast = 0.3
+    colorCorrection.Saturation = 0.2
+    colorCorrection.TintColor = Color3.fromRGB(255, 240, 220)
+    colorCorrection.Name = "ColorCorrectionEffect"
+    colorCorrection.Parent = Lighting
+
+    local depthOfField = Instance.new("DepthOfFieldEffect")
+    depthOfField.FocusDistance = 20
+    depthOfField.InFocusRadius = 50
+    depthOfField.NearIntensity = 0.5
+    depthOfField.FarIntensity = 0.5
+    depthOfField.Name = "DepthOfFieldEffect"
+    depthOfField.Parent = Lighting
+end
+
+-- Функция исчезновения GUI
+local function FadeOutGUI()
+    local tween = TweenService:Create(Frame, TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, -0.5, 0)})
+    tween:Play()
+    wait(1)
+    ScreenGui:Destroy()
+end
+
+-- Логика кнопки Verify
+VerifyButton.MouseButton1Click:Connect(function()
+    if TextBox.Text == "MaxLig" then
+        EnableEffects()
+        FadeOutGUI()
+    else
+        TextBox.Text = ""
+        TextBox.PlaceholderText = "Неверный ключ!"
+        TextBox.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        wait(1)
+        TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        TextBox.PlaceholderText = "Введите ключ"
+    end
+end)
+
+-- Логика кнопки Discord (копирует ссылку)
+DiscordButton.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/example") -- Сюда вставьте свою ссылку
+    DiscordButton.Text = "Copied!"
+    wait(1)
+    DiscordButton.Text = "Discord"
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Return then
+        VerifyButton:MouseButton1Click()
+    end
+end)
