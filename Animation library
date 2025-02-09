@@ -1,1 +1,144 @@
-"local Players = game:GetService(\"Players\")\r\nlocal LocalPlayer = Players.LocalPlayer\r\nlocal Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()\r\nlocal Humanoid = Character:FindFirstChildOfClass(\"Humanoid\")\r\n\r\n-- 🌟 UI создание\r\nlocal ScreenGui = Instance.new(\"ScreenGui\", LocalPlayer:WaitForChild(\"PlayerGui\"))\r\nScreenGui.ResetOnSpawn = false\r\n\r\n-- 🔑 Окно для ввода ключа\r\nlocal KeyFrame = Instance.new(\"Frame\", ScreenGui)\r\nKeyFrame.Size = UDim2.new(0, 300, 0, 150)\r\nKeyFrame.Position = UDim2.new(0.5, -150, 0.5, -75)\r\nKeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)\r\nKeyFrame.Visible = true\r\n\r\nlocal KeyInput = Instance.new(\"TextBox\", KeyFrame)\r\nKeyInput.Size = UDim2.new(0.8, 0, 0.3, 0)\r\nKeyInput.Position = UDim2.new(0.1, 0, 0.4, 0)\r\nKeyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)\r\nKeyInput.TextColor3 = Color3.new(1, 1, 1)\r\nKeyInput.PlaceholderText = \"Введите ключ...\"\r\nKeyInput.Font = Enum.Font.SourceSans\r\nKeyInput.TextSize = 18\r\n\r\nlocal KeyButton = Instance.new(\"TextButton\", KeyFrame)\r\nKeyButton.Size = UDim2.new(0.6, 0, 0.3, 0)\r\nKeyButton.Position = UDim2.new(0.1, 0, 0.75, 0)\r\nKeyButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)\r\nKeyButton.TextColor3 = Color3.new(1, 1, 1)\r\nKeyButton.Text = \"Подтвердить\"\r\nKeyButton.Font = Enum.Font.SourceSansBold\r\nKeyButton.TextSize = 18\r\n\r\n-- 🔗 Кнопка DC в GUI Key\r\nlocal KeyDCButton = Instance.new(\"TextButton\", KeyFrame)\r\nKeyDCButton.Size = UDim2.new(0.2, 0, 0.3, 0)\r\nKeyDCButton.Position = UDim2.new(0.75, 0, 0.75, 0)\r\nKeyDCButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)\r\nKeyDCButton.TextColor3 = Color3.new(1, 1, 1)\r\nKeyDCButton.Text = \"DC\"\r\nKeyDCButton.Font = Enum.Font.SourceSansBold\r\nKeyDCButton.TextSize = 14\r\n\r\n-- 📜 Главное окно Animation Library\r\nlocal MainFrame = Instance.new(\"Frame\", ScreenGui)\r\nMainFrame.Size = UDim2.new(0, 400, 0, 500)\r\nMainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)\r\nMainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)\r\nMainFrame.Visible = false\r\nMainFrame.Active = true\r\nMainFrame.Draggable = true\r\n\r\nlocal Title = Instance.new(\"TextLabel\", MainFrame)\r\nTitle.Size = UDim2.new(1, 0, 0.1, 0)\r\nTitle.Position = UDim2.new(0, 0, 0, 0)\r\nTitle.Text = \"Animation Library\"\r\nTitle.TextColor3 = Color3.new(1, 1, 1)\r\nTitle.BackgroundTransparency = 1\r\nTitle.Font = Enum.Font.SourceSansBold\r\nTitle.TextSize = 22\r\n\r\nlocal AnimList = Instance.new(\"ScrollingFrame\", MainFrame)\r\nAnimList.Size = UDim2.new(1, 0, 0.9, 0)\r\nAnimList.Position = UDim2.new(0, 0, 0.1, 0)\r\nAnimList.CanvasSize = UDim2.new(0, 0, 10, 0)\r\nAnimList.BackgroundColor3 = Color3.fromRGB(25, 25, 25)\r\n\r\n-- 🔄 Функция загрузки анимаций\r\nlocal function LoadAnimations()\r\n    AnimList:ClearAllChildren()\r\n    local yOffset = 0\r\n    for _, anim in pairs(game:GetDescendants()) do\r\n        if anim:IsA(\"Animation\") then\r\n            local AnimFrame = Instance.new(\"Frame\", AnimList)\r\n            AnimFrame.Size = UDim2.new(1, 0, 0, 50)\r\n            AnimFrame.Position = UDim2.new(0, 0, 0, yOffset)\r\n            AnimFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)\r\n\r\n            local AnimText = Instance.new(\"TextLabel\", AnimFrame)\r\n            AnimText.Size = UDim2.new(0.55, 0, 1, 0)\r\n            AnimText.Position = UDim2.new(0, 5, 0, 0)\r\n            AnimText.Text = anim.Name\r\n            AnimText.TextColor3 = Color3.new(1, 1, 1)\r\n            AnimText.BackgroundTransparency = 1\r\n            AnimText.Font = Enum.Font.SourceSans\r\n            AnimText.TextSize = 16\r\n            AnimText.TextXAlignment = Enum.TextXAlignment.Left\r\n\r\n            local PlayButton = Instance.new(\"TextButton\", AnimFrame)\r\n            PlayButton.Size = UDim2.new(0.2, 0, 1, 0)\r\n            PlayButton.Position = UDim2.new(0.55, 5, 0, 0)\r\n            PlayButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)\r\n            PlayButton.TextColor3 = Color3.new(1, 1, 1)\r\n            PlayButton.Text = \"▶\"\r\n            PlayButton.Font = Enum.Font.SourceSansBold\r\n            PlayButton.TextSize = 18\r\n\r\n            local CopyButton = Instance.new(\"TextButton\", AnimFrame)\r\n            CopyButton.Size = UDim2.new(0.2, 0, 1, 0)\r\n            CopyButton.Position = UDim2.new(0.75, 5, 0, 0)\r\n            CopyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)\r\n            CopyButton.TextColor3 = Color3.new(1, 1, 1)\r\n            CopyButton.Text = \"📋\"\r\n            CopyButton.Font = Enum.Font.SourceSansBold\r\n            CopyButton.TextSize = 18\r\n\r\n            PlayButton.MouseButton1Click:Connect(function()\r\n                if Humanoid then\r\n                    local Animator = Humanoid:FindFirstChildOfClass(\"Animator\") or Instance.new(\"Animator\", Humanoid)\r\n                    local AnimationTrack = Animator:LoadAnimation(anim)\r\n                    AnimationTrack:Play()\r\n                end\r\n            end)\r\n\r\n            CopyButton.MouseButton1Click:Connect(function()\r\n                setclipboard(anim.AnimationId)\r\n            end)\r\n\r\n            yOffset = yOffset + 50\r\n        end\r\n    end\r\n    AnimList.CanvasSize = UDim2.new(0, 0, 0, yOffset)\r\nend\r\n\r\n-- 🔑 Проверка ключа\r\nKeyButton.MouseButton1Click:Connect(function()\r\n    if KeyInput.Text == \"ScAnim\" then\r\n        KeyFrame.Visible = false\r\n        MainFrame.Visible = true\r\n        LoadAnimations() -- 💡 Теперь анимации точно загружаются\r\n    else\r\n        KeyInput.Text = \"Неверный ключ!\"\r\n        KeyInput.TextColor3 = Color3.new(1, 0, 0)\r\n        wait(1)\r\n        KeyInput.Text = \"\"\r\n        KeyInput.TextColor3 = Color3.new(1, 1, 1)\r\n    end\r\nend)\r\n\r\n-- 🔗 Копирование Discord-ссылки\r\nKeyDCButton.MouseButton1Click:Connect(function()\r\n    setclipboard(\"https://discord.gg/VgvJ7S25EZ\")\r\nend)\r\n"
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+-- 🌟 UI создание
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+-- 🔑 Окно для ввода ключа
+local KeyFrame = Instance.new("Frame", ScreenGui)
+KeyFrame.Size = UDim2.new(0, 300, 0, 150)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+KeyFrame.Visible = true
+
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.Size = UDim2.new(0.8, 0, 0.3, 0)
+KeyInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+KeyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+KeyInput.TextColor3 = Color3.new(1, 1, 1)
+KeyInput.PlaceholderText = "Code..."
+KeyInput.Font = Enum.Font.SourceSans
+KeyInput.TextSize = 18
+
+local KeyButton = Instance.new("TextButton", KeyFrame)
+KeyButton.Size = UDim2.new(0.6, 0, 0.3, 0)
+KeyButton.Position = UDim2.new(0.1, 0, 0.75, 0)
+KeyButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+KeyButton.TextColor3 = Color3.new(1, 1, 1)
+KeyButton.Text = "Verify"
+KeyButton.Font = Enum.Font.SourceSansBold
+KeyButton.TextSize = 18
+
+-- 🔗 Кнопка DC в GUI Key
+local KeyDCButton = Instance.new("TextButton", KeyFrame)
+KeyDCButton.Size = UDim2.new(0.2, 0, 0.3, 0)
+KeyDCButton.Position = UDim2.new(0.75, 0, 0.75, 0)
+KeyDCButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+KeyDCButton.TextColor3 = Color3.new(1, 1, 1)
+KeyDCButton.Text = "DC"
+KeyDCButton.Font = Enum.Font.SourceSansBold
+KeyDCButton.TextSize = 14
+
+-- 📜 Главное окно Animation Library
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 400, 0, 500)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0.1, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "Animation Library"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 22
+
+local AnimList = Instance.new("ScrollingFrame", MainFrame)
+AnimList.Size = UDim2.new(1, 0, 0.9, 0)
+AnimList.Position = UDim2.new(0, 0, 0.1, 0)
+AnimList.CanvasSize = UDim2.new(0, 0, 10, 0)
+AnimList.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+
+-- 🔄 Функция загрузки анимаций
+local function LoadAnimations()
+    AnimList:ClearAllChildren()
+    local yOffset = 0
+    for _, anim in pairs(game:GetDescendants()) do
+        if anim:IsA("Animation") then
+            local AnimFrame = Instance.new("Frame", AnimList)
+            AnimFrame.Size = UDim2.new(1, 0, 0, 50)
+            AnimFrame.Position = UDim2.new(0, 0, 0, yOffset)
+            AnimFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+            local AnimText = Instance.new("TextLabel", AnimFrame)
+            AnimText.Size = UDim2.new(0.55, 0, 1, 0)
+            AnimText.Position = UDim2.new(0, 5, 0, 0)
+            AnimText.Text = anim.Name
+            AnimText.TextColor3 = Color3.new(1, 1, 1)
+            AnimText.BackgroundTransparency = 1
+            AnimText.Font = Enum.Font.SourceSans
+            AnimText.TextSize = 16
+            AnimText.TextXAlignment = Enum.TextXAlignment.Left
+
+            local PlayButton = Instance.new("TextButton", AnimFrame)
+            PlayButton.Size = UDim2.new(0.2, 0, 1, 0)
+            PlayButton.Position = UDim2.new(0.55, 5, 0, 0)
+            PlayButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+            PlayButton.TextColor3 = Color3.new(1, 1, 1)
+            PlayButton.Text = "▶"
+            PlayButton.Font = Enum.Font.SourceSansBold
+            PlayButton.TextSize = 18
+
+            local CopyButton = Instance.new("TextButton", AnimFrame)
+            CopyButton.Size = UDim2.new(0.2, 0, 1, 0)
+            CopyButton.Position = UDim2.new(0.75, 5, 0, 0)
+            CopyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+            CopyButton.TextColor3 = Color3.new(1, 1, 1)
+            CopyButton.Text = "📋"
+            CopyButton.Font = Enum.Font.SourceSansBold
+            CopyButton.TextSize = 18
+
+            PlayButton.MouseButton1Click:Connect(function()
+                if Humanoid then
+                    local Animator = Humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", Humanoid)
+                    local AnimationTrack = Animator:LoadAnimation(anim)
+                    AnimationTrack:Play()
+                end
+            end)
+
+            CopyButton.MouseButton1Click:Connect(function()
+                setclipboard(anim.AnimationId)
+            end)
+
+            yOffset = yOffset + 50
+        end
+    end
+    AnimList.CanvasSize = UDim2.new(0, 0, 0, yOffset)
+end
+
+-- 🔑 Проверка ключа
+KeyButton.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "ScAnim" then
+        KeyFrame.Visible = false
+        MainFrame.Visible = true
+        LoadAnimations() -- 💡 Теперь анимации точно загружаются
+    else
+        KeyInput.Text = "Not key!"
+        KeyInput.TextColor3 = Color3.new(1, 0, 0)
+        wait(1)
+        KeyInput.Text = ""
+        KeyInput.TextColor3 = Color3.new(1, 1, 1)
+    end
+end)
+
+-- 🔗 Копирование Discord-ссылки
+KeyDCButton.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/VgvJ7S25EZ")
+end)
