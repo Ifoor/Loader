@@ -1,0 +1,130 @@
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- ✅ Главное UI (запускается сразу)
+local Window = WindUI:CreateWindow({
+    Title = "Admin Panel",
+    Icon = "shield",
+    Author = "YourHub",
+    Folder = "YourHub",
+    Size = UDim2.fromOffset(580, 460),
+    Transparent = true,
+    Theme = "Dark",
+})
+
+-- 🎛️ UI Toggle (LeftControl)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.LeftControl and not gameProcessed then
+        Window:Toggle()
+    end
+end)
+
+-- 📌 Основные читы
+local CheatTab = Window:Tab({ Title = "Читы", Icon = "zap" })
+
+-- 🎭 Полная невидимость
+CheatTab:Toggle({
+    Title = "Полная невидимость",
+    Default = false,
+    Callback = function(state)
+        for _, v in pairs(LocalPlayer.Character:GetChildren()) do
+            if v:IsA("BasePart") or v:IsA("Accessory") then
+                v.Transparency = state and 1 or 0
+                if v:IsA("BasePart") then v.CanCollide = not state end
+            end
+        end
+        LocalPlayer.Character.Head.face.Transparency = state and 1 or 0
+    end
+})
+
+-- 🚀 Улучшенный полёт
+local flying = false
+local BodyVelocity, BodyGyro
+
+CheatTab:Toggle({
+    Title = "Полёт",
+    Default = false,
+    Callback = function(state)
+        flying = state
+        if state then
+            BodyVelocity = Instance.new("BodyVelocity", LocalPlayer.Character.HumanoidRootPart)
+            BodyVelocity.Velocity = Vector3.zero
+            BodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+
+            BodyGyro = Instance.new("BodyGyro", LocalPlayer.Character.HumanoidRootPart)
+            BodyGyro.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+            BodyGyro.MaxTorque = Vector3.new(4000, 4000, 4000)
+
+            RunService.RenderStepped:Connect(function()
+                if flying then
+                    BodyVelocity.Velocity = LocalPlayer.Character.Humanoid.MoveDirection * 50
+                end
+            end)
+        else
+            if BodyVelocity then BodyVelocity:Destroy() end
+            if BodyGyro then BodyGyro:Destroy() end
+        end
+    end
+})
+
+-- 🔵 ESP (виден через стены)
+local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
+local espEnabled = false
+
+ESPTab:Toggle({
+    Title = "ESP Игроков",
+    Default = false,
+    Callback = function(state)
+        espEnabled = state
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                if state then
+                    local highlight = Instance.new("Highlight", player.Character)
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.FillTransparency = 0.2
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    highlight.OutlineTransparency = 0
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Видно через стены
+                else
+                    for _, obj in pairs(player.Character:GetChildren()) do
+                        if obj:IsA("Highlight") then obj:Destroy() end
+                    end
+                end
+            end
+        end
+    end
+})
+
+-- 🔧 Настройки
+local SettingsTab = Window:Tab({ Title = "Настройки", Icon = "settings" })
+
+SettingsTab:Button({
+    Title = "Закрыть UI",
+    Callback = function()
+        Window:Destroy()
+    end
+})
+
+SettingsTab:Button({
+    Title = "Сохранить настройки",
+    Callback = function()
+        writefile("AdminConfig.json", game:GetService("HttpService"):JSONEncode({
+            WalkSpeed = LocalPlayer.Character.Humanoid.WalkSpeed,
+            JumpPower = LocalPlayer.Character.Humanoid.JumpPower,
+        }))
+    end
+})
+
+SettingsTab:Button({
+    Title = "Загрузить настройки",
+    Callback = function()
+        if isfile("AdminConfig.json") then
+            local data = game:GetService("HttpService"):JSONDecode(readfile("AdminConfig.json"))
+            LocalPlayer.Character.Humanoid.WalkSpeed = data.WalkSpeed
+            LocalPlayer.Character.Humanoid.JumpPower = data.JumpPower
+        end
+    end
+})
