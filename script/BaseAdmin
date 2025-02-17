@@ -1,130 +1,221 @@
+-- Load WindUI
 local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 
--- ✅ Главное UI (запускается сразу)
+-- Create window
 local Window = WindUI:CreateWindow({
-    Title = "Admin Panel",
-    Icon = "shield",
-    Author = "YourHub",
-    Folder = "YourHub",
-    Size = UDim2.fromOffset(580, 460),
+    Title = "Roblox Cheat Menu",
+    Icon = "gamepad",
+    Author = "YourName",
+    Folder = "CheatHub",
+    Size = UDim2.fromOffset(600, 500),
     Transparent = true,
     Theme = "Dark",
+    SideBarWidth = 200,
 })
 
--- 🎛️ UI Toggle (LeftControl)
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.LeftControl and not gameProcessed then
-        Window:Toggle()
+-- Tabs
+local MainTab = Window:Tab({ Title = "Main Cheats", Icon = "zap" })
+local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
+local ConfigTab = Window:Tab({ Title = "Settings", Icon = "keyboard" })
+
+-- ✅ **God Mode**
+MainTab:Toggle({
+    Title = "God Mode",
+    Default = false,
+    Callback = function(state)
+        local player = game.Players.LocalPlayer
+        if state then
+            player.Character.Humanoid.MaxHealth = math.huge
+            player.Character.Humanoid.Health = math.huge
+        else
+            player.Character.Humanoid.MaxHealth = 100
+        end
+    end
+})
+
+-- ✅ **Fly Mode**
+local flying = false
+MainTab:Toggle({
+    Title = "Fly Mode",
+    Default = false,
+    Callback = function(state)
+        local player = game.Players.LocalPlayer
+        local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+        if state and root then
+            flying = true
+            local uis = game:GetService("UserInputService")
+            local runService = game:GetService("RunService")
+            local speed = 50
+
+            local direction = Vector3.new(0, 0, 0)
+
+            local function onInputBegan(input)
+                if input.KeyCode == Enum.KeyCode.W then
+                    direction = Vector3.new(0, 0, -1)
+                elseif input.KeyCode == Enum.KeyCode.S then
+                    direction = Vector3.new(0, 0, 1)
+                elseif input.KeyCode == Enum.KeyCode.A then
+                    direction = Vector3.new(-1, 0, 0)
+                elseif input.KeyCode == Enum.KeyCode.D then
+                    direction = Vector3.new(1, 0, 0)
+                elseif input.KeyCode == Enum.KeyCode.Space then
+                    direction = Vector3.new(0, 1, 0)
+                elseif input.KeyCode == Enum.KeyCode.LeftShift then
+                    direction = Vector3.new(0, -1, 0)
+                end
+            end
+
+            local function onInputEnded(input)
+                if input.KeyCode == Enum.KeyCode.W or input.KeyCode == Enum.KeyCode.S or
+                   input.KeyCode == Enum.KeyCode.A or input.KeyCode == Enum.KeyCode.D or
+                   input.KeyCode == Enum.KeyCode.Space or input.KeyCode == Enum.KeyCode.LeftShift then
+                    direction = Vector3.new(0, 0, 0)
+                end
+            end
+
+            local flyLoop
+            flyLoop = runService.RenderStepped:Connect(function()
+                if flying and root then
+                    local camera = workspace.CurrentCamera
+                    local moveDirection = camera.CFrame:VectorToWorldSpace(direction)
+                    root.Velocity = moveDirection * speed
+                else
+                    flyLoop:Disconnect()
+                end
+            end)
+
+            uis.InputBegan:Connect(onInputBegan)
+            uis.InputEnded:Connect(onInputEnded)
+        else
+            flying = false
+            root.Velocity = Vector3.new(0, 0, 0)
+        end
+    end
+})
+
+-- ✅ **Infinite Jump**
+local UserInputService = game:GetService("UserInputService")
+local Player = game.Players.LocalPlayer
+local JumpEnabled = true
+
+UserInputService.JumpRequest:Connect(function()
+    if JumpEnabled then
+        Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
 
--- 📌 Основные читы
-local CheatTab = Window:Tab({ Title = "Читы", Icon = "zap" })
-
--- 🎭 Полная невидимость
-CheatTab:Toggle({
-    Title = "Полная невидимость",
+-- ✅ **ESP Players**
+ESPTab:Toggle({
+    Title = "ESP Players",
     Default = false,
     Callback = function(state)
-        for _, v in pairs(LocalPlayer.Character:GetChildren()) do
-            if v:IsA("BasePart") or v:IsA("Accessory") then
-                v.Transparency = state and 1 or 0
-                if v:IsA("BasePart") then v.CanCollide = not state end
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local highlight = Instance.new("Highlight")
+                highlight.Parent = player.Character
+                highlight.FillColor = Color3.new(1, 0, 0)
+                highlight.OutlineTransparency = 0.5
+                highlight.Enabled = state
             end
         end
-        LocalPlayer.Character.Head.face.Transparency = state and 1 or 0
     end
 })
 
--- 🚀 Улучшенный полёт
-local flying = false
-local BodyVelocity, BodyGyro
-
-CheatTab:Toggle({
-    Title = "Полёт",
+-- ✅ **NoClip (Improved)**
+local noclip = false
+MainTab:Toggle({
+    Title = "NoClip",
     Default = false,
     Callback = function(state)
-        flying = state
-        if state then
-            BodyVelocity = Instance.new("BodyVelocity", LocalPlayer.Character.HumanoidRootPart)
-            BodyVelocity.Velocity = Vector3.zero
-            BodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        noclip = state
+        local char = game.Players.LocalPlayer.Character
 
-            BodyGyro = Instance.new("BodyGyro", LocalPlayer.Character.HumanoidRootPart)
-            BodyGyro.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-            BodyGyro.MaxTorque = Vector3.new(4000, 4000, 4000)
-
-            RunService.RenderStepped:Connect(function()
-                if flying then
-                    BodyVelocity.Velocity = LocalPlayer.Character.Humanoid.MoveDirection * 50
+        while noclip do
+            for _, part in pairs(char:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
                 end
-            end)
-        else
-            if BodyVelocity then BodyVelocity:Destroy() end
-            if BodyGyro then BodyGyro:Destroy() end
+            end
+            wait(0.1) -- Prevents script from freezing
+        end
+
+        -- Re-enable collision when NoClip is turned off
+        for _, part in pairs(char:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
         end
     end
 })
 
--- 🔵 ESP (виден через стены)
-local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
-local espEnabled = false
+-- ✅ **Teleport Tool**
+MainTab:Button({
+    Title = "Give Teleport Tool",
+    Callback = function()
+        local tool = Instance.new("Tool")
+        tool.Name = "Teleport"
+        tool.RequiresHandle = false
+        tool.Parent = game.Players.LocalPlayer.Backpack
 
-ESPTab:Toggle({
-    Title = "ESP Игроков",
-    Default = false,
-    Callback = function(state)
-        espEnabled = state
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
-                if state then
-                    local highlight = Instance.new("Highlight", player.Character)
-                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                    highlight.FillTransparency = 0.2
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                    highlight.OutlineTransparency = 0
-                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Видно через стены
-                else
-                    for _, obj in pairs(player.Character:GetChildren()) do
-                        if obj:IsA("Highlight") then obj:Destroy() end
+        tool.Activated:Connect(function()
+            local player = game.Players.LocalPlayer
+            local mouse = player:GetMouse()
+
+            if mouse.Target then
+                player.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.p)
+            end
+        end)
+    end
+})
+
+-- ✅ **Keybind Settings**
+local keybinds = {
+    ["Fly Mode"] = Enum.KeyCode.F,
+    ["No Clip"] = Enum.KeyCode.N
+}
+
+ConfigTab:Dropdown({
+    Title = "Select Cheat to Rebind Key",
+    Values = { "Fly Mode", "No Clip" },
+    Callback = function(selected)
+        local inputListener
+        inputListener = game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+            if not processed then
+                keybinds[selected] = input.KeyCode
+                inputListener:Disconnect()
+            end
+        end)
+    end
+})
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+    if not processed then
+        for cheat, key in pairs(keybinds) do
+            if input.KeyCode == key then
+                if cheat == "Fly Mode" then
+                    flying = not flying
+                elseif cheat == "No Clip" then
+                    noclip = not noclip
+                    local char = game.Players.LocalPlayer.Character
+
+                    while noclip do
+                        for _, part in pairs(char:GetChildren()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                        wait(0.1)
+                    end
+
+                    -- Re-enable collision when NoClip is turned off
+                    for _, part in pairs(char:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                        end
                     end
                 end
             end
         end
     end
-})
-
--- 🔧 Настройки
-local SettingsTab = Window:Tab({ Title = "Настройки", Icon = "settings" })
-
-SettingsTab:Button({
-    Title = "Закрыть UI",
-    Callback = function()
-        Window:Destroy()
-    end
-})
-
-SettingsTab:Button({
-    Title = "Сохранить настройки",
-    Callback = function()
-        writefile("AdminConfig.json", game:GetService("HttpService"):JSONEncode({
-            WalkSpeed = LocalPlayer.Character.Humanoid.WalkSpeed,
-            JumpPower = LocalPlayer.Character.Humanoid.JumpPower,
-        }))
-    end
-})
-
-SettingsTab:Button({
-    Title = "Загрузить настройки",
-    Callback = function()
-        if isfile("AdminConfig.json") then
-            local data = game:GetService("HttpService"):JSONDecode(readfile("AdminConfig.json"))
-            LocalPlayer.Character.Humanoid.WalkSpeed = data.WalkSpeed
-            LocalPlayer.Character.Humanoid.JumpPower = data.JumpPower
-        end
-    end
-})
+end)
