@@ -1,0 +1,63 @@
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Key System",
+    Icon = "key",
+    Author = "Hazaku",
+    Folder = "KeyHub",
+    Size = UDim2.fromOffset(400, 300),
+    Transparent = false,
+    Theme = "Dark",
+})
+
+local InputTab = Window:Tab({ Title = "Enter Key", Icon = "key" })
+
+local validKeys = { "PaidC" }
+local enteredKey = ""
+
+-- Поле для ввода ключа
+InputTab:Input({
+    Title = "Enter Key",
+    Default = "",
+    Placeholder = "Enter your key here",
+    Callback = function(input)
+        enteredKey = input
+    end
+})
+
+-- Кнопка проверки ключа
+InputTab:Button({
+    Title = "Submit Key",
+    Desc = "Check the entered key",
+    Callback = function()
+        if table.find(validKeys, enteredKey) then
+            WindUI:Notify({
+                Title = "Access Granted",
+                Content = "Correct Key! Loading script...",
+                Duration = 3,
+            })
+            wait(3.5) -- Небольшая задержка
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Ifoor/Loader/refs/heads/main/script/Character%20Paid%20Selector", true))()
+        else
+            WindUI:Notify({
+                Title = "Access Denied",
+                Content = "Incorrect Key! Try again.",
+                Duration = 3,
+            })
+        end
+    end
+})
+
+-- Кнопка с копированием Discord-ссылки
+InputTab:Button({
+    Title = "Copy Discord Link",
+    Desc = "Click to copy our Discord link",
+    Callback = function()
+        setclipboard("https://discord.gg/VgvJ7S25EZ") -- Копирование в буфер обмена
+        WindUI:Notify({
+            Title = "Copied!",
+            Content = "Discord link copied to clipboard.",
+            Duration = 3,
+        })
+    end
+})
