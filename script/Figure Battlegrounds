@@ -1,7 +1,7 @@
 local slot0_a1073 = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
 local slot1_a1008 = slot0_a1073.CreateWindow
 local slot3_a1009 = {
-	Author = "CloudHub",
+	Author = "Hazaku",
 	SideBarWidth = 200,
 	Theme = "Dark",
 	Transparent = true,
