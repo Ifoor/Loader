@@ -1,57 +1,85 @@
-local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
-
-local Window = WindUI:CreateWindow({
-    Title = "Character Selection",
-    Icon = "users",
-    Author = "CloudHub",
-    Folder = "CharacterHub",
-    Size = UDim2.fromOffset(580, 460),
-    Transparent = true,
-    Theme = "Dark",
-    SideBarWidth = 200,
+local slot0_a1073 = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))()
+local slot1_a1008 = slot0_a1073.CreateWindow
+local slot3_a1009 = {
+	Author = "CloudHub",
+	SideBarWidth = 200,
+	Theme = "Dark",
+	Transparent = true,
+	Icon = "users",
+	Folder = "CharacterHub",
+	Title = "Character Selection",
+	Size = UDim2.fromOffset(580, 460)
+}
+local slot1_a1075 = slot1_a1008(slot0_a1073, slot3_a1009)
+local slot2_a1049 = slot1_a1075:Tab({
+	Desc = "Select a character moveset",
+	Icon = "user",
+	Title = "Characters"
 })
 
-local CharacterTab = Window:Tab({ 
-    Title = "Characters", 
-    Icon = "user", 
-    Desc = "Select a character moveset" 
-})
+local function slot3_a1072(arg0)
+	local slot1_a1021 = {
+		[1.0] = "SetMoveset",
+		[2] = arg0
+	}
 
--- Функция для отправки запроса на сервер с выбранным персонажем
-local function setCharacterMoveset(character)
-    local args = {
-        [1] = "SetMoveset",
-        [2] = character
-    }
-
-    game:GetService("ReplicatedStorage").Remotes.Comunicator.Set:FireServer(unpack(args))
+	game:GetService("ReplicatedStorage").Remotes.Comunicator.Set:FireServer(unpack(slot1_a1021))
 end
 
--- Таблица с персонажами и их идентификаторами
-local characters = {
-    { Name = "Jun", ID = "Jun" },
-    { Name = "Gojo", ID = "Gojo" },
-    { Name = "Sukuna", ID = "Sukuna" },
-    { Name = "Kratos", ID = "Kratos" },
-    { Name = "Martial Artist", ID = "MartialArtist" },
-    { Name = "Admin", ID = "Admin" }
+local slot4_a1035 = {
+	{
+		ID = "Jun",
+		Name = "Jun"
+	},
+	{
+		ID = "Gojo",
+		Name = "Gojo"
+	},
+	{
+		ID = "Sukuna",
+		Name = "Sukuna"
+	},
+	{
+		ID = "Kratos",
+		Name = "Kratos"
+	},
+	{
+		ID = "MartialArtist",
+		Name = "Martial Artist"
+	},
+	{
+		ID = "JK",
+		Name = "JK"
+	},
+	{
+		ID = "Admin",
+		Name = "Admin"
+	}
 }
 
--- Создание кнопок для каждого персонажа
-for _, character in ipairs(characters) do
-    CharacterTab:Button({
-        Title = character.Name,
-        Desc = "Select " .. character.Name,
-        Callback = function() 
-            setCharacterMoveset(character.ID) 
-            WindUI:Notify({
-                Title = "Character Selected",
-                Content = character.Name .. " moveset activated!",
-                Icon = "check",
-                Duration = 3
-            })
-        end
-    })
+for slot8_a1047, slot9_a1053 in ipairs(slot4_a1035) do
+	local slot10_a1051 = slot2_a1049.Button
+	local slot12_a1052 = {
+		Title = slot9_a1053.Name,
+		Desc = "Select " .. slot9_a1053.Name
+	}
+
+	function slot12_a1052.Callback()
+		slot3_a1072(slot9_a1053.ID)
+
+		local slot0_a1064 = slot0_a1073
+		local slot0_a1066 = slot0_a1064.Notify
+		local slot2_a1067 = {
+			Duration = 3,
+			Icon = "check",
+			Title = "Character Selected",
+			Content = slot9_a1053.Name .. " moveset activated!"
+		}
+
+		slot0_a1066(slot0_a1064, slot2_a1067)
+	end
+
+	slot10_a1051(slot2_a1049, slot12_a1052)
 end
 
-Window:SelectTab(1)
+slot1_a1075:SelectTab(1)
