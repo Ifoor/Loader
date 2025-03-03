@@ -6,11 +6,6 @@ local Window = WindUI:CreateWindow({
     Author = "Hazaku",
     Folder = "YourHub",
     Size = UDim2.fromOffset(400, 300),
-    KeySystem = {
-        Key = { "1234", "5678" },
-        Note = "Enter the correct key to proceed.",
-        SaveKey = true,
-    },
     Transparent = true,
     Theme = "Dark",
 })
